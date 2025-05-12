@@ -93,17 +93,60 @@ function App() {
 
   //ADD
   const addToCart = (prodotto) => {
-    const isProductHere = addedProducts.some(p => p.name === prodotto.name);
-    if (isProductHere) {
-      return;
-    }
-    const newProduct = {
-      ...prodotto,
-      quantity: 1
+    // const isProductHere = addedProducts.some(p => p.name === prodotto.name); //questo booleano diventa un FIND per 
+    const findAddedProduct = addedProducts.find(p => p.name === prodotto.name);
+
+    if (findAddedProduct) {
+      updateProductQuantity(findAddedProduct.name, findAddedProduct.quantity + 1)
+      return; // blocca la funzione se il prodotto è già presente(ricordi il .some()? )
     }
 
-    setAddedProducts(curr => [...curr, newProduct])
+    //? lo si puo inserire direttamente come nuovo prodotto nel setProducts
+    // const newProduct = {
+    //   ...prodotto,
+    //   quantity: 1
+    // }
+
+    setAddedProducts(curr => [...curr, {
+      ...prodotto,
+      quantity: 1
+    }])
   }
+
+  //UPDATE
+  const updateProductQuantity = (nome, quantità) => {
+
+    //* mi aspetto che setAddedProducts rispetto al suo stato corrente, 
+    //* ritorni un map (perche oltre che aggiornare la quantità del prodotto per 
+    //* cui clicco dovrà ANCHE ridarmi i prodotti non modificati)
+    //* dove SOLO SE il nome che cerco coincide ALLORA mi cambia la quantità
+    //* ALTRIMENTI ristampa il prodotto invariato che tradotto in ternario fa:
+
+    setAddedProducts(curr => curr.map(p => p.name === nome ? { ...p, quantity: quantità } : p))
+
+    //versione senza ternario
+    // setAddedProducts(curr => curr.map(p => {
+    //   if (p.name === nome) {
+    //     return {
+    //       ...p,
+    //       quantity: quantità
+    //     }
+    //   }
+    //   return p
+
+  }
+
+  //REMOVE
+  const removeFromCart = prodotto => {
+    setAddedProducts(curr => curr.filter(p => p.name !== prodotto.name));
+
+  }
+
+  //TOTALE con i .reduce()
+  const total = addedProducts.reduce((acc, product) => {
+    return acc + (product.price * product.quantity)
+  }, 0)
+
 
   return (
     <div className="container">
@@ -115,6 +158,7 @@ function App() {
               <p>
                 {p.name} ({p.price.toFixed(2)}€)
                 <button onClick={() => addToCart(p)}> Aggiungi al Carrello</button>
+
               </p>
 
             </li>
@@ -129,12 +173,9 @@ function App() {
               {addedProducts.map((p, i) => (
                 <li key={i}>
                   <p>
-                    {/* <p onClick={() => dispatchTasks({ type: 'TOGGLE_TASK', payload: i })}> */}
-                    {/* {task.completed ? <s>{task.text}</s> : task.text} */}
-
                     {p.name} === Prezzo : {p.price} € === Quantità : {p.quantity}
                   </p>
-
+                  <button onClick={() => removeFromCart(p)}> Rimuovi dal Carrello</button>
                 </li>
               ))}
             </ul>
@@ -142,6 +183,7 @@ function App() {
           </>)
         }
       </ul>
+      <h3>Totale da Pagare : {total.toFixed(2)}€</h3>
     </div>
   )
 }
