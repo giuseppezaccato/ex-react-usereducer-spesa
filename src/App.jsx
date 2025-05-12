@@ -93,12 +93,13 @@ function App() {
 
   //ADD
   const addToCart = (prodotto) => {
-    // const isProductHere = addedProducts.some(p => p.name === prodotto.name); //questo booleano diventa un FIND per 
+    // const isProductHere = addedProducts.some(p => p.name === prodotto.name); 
+    //* questo SOME diventa un FIND per l'aggiornamento della quantità su un prodotto(se presente)
     const findAddedProduct = addedProducts.find(p => p.name === prodotto.name);
 
     if (findAddedProduct) {
       updateProductQuantity(findAddedProduct.name, findAddedProduct.quantity + 1)
-      return; // blocca la funzione se il prodotto è già presente(ricordi il .some()? )
+      return;
     }
 
     //? lo si puo inserire direttamente come nuovo prodotto nel setProducts
@@ -124,7 +125,7 @@ function App() {
 
     setAddedProducts(curr => curr.map(p => p.name === nome ? { ...p, quantity: quantità } : p))
 
-    //versione senza ternario
+    //? versione senza ternario
     // setAddedProducts(curr => curr.map(p => {
     //   if (p.name === nome) {
     //     return {
@@ -139,13 +140,12 @@ function App() {
   //REMOVE
   const removeFromCart = prodotto => {
     setAddedProducts(curr => curr.filter(p => p.name !== prodotto.name));
-
   }
 
-  //TOTALE con i .reduce()
+  //TOTALE
   const total = addedProducts.reduce((acc, product) => {
     return acc + (product.price * product.quantity)
-  }, 0)
+  }, 0);
 
 
   return (
@@ -158,7 +158,6 @@ function App() {
               <p>
                 {p.name} ({p.price.toFixed(2)}€)
                 <button onClick={() => addToCart(p)}> Aggiungi al Carrello</button>
-
               </p>
 
             </li>
@@ -167,20 +166,22 @@ function App() {
 
       <ul>
         {
-          addedProducts.length > 0 && (<>
-            <h3>Nuovo Carrello</h3>
-            <ul>
-              {addedProducts.map((p, i) => (
-                <li key={i}>
-                  <p>
-                    {p.name} === Prezzo : {p.price} € === Quantità : {p.quantity}
-                  </p>
-                  <button onClick={() => removeFromCart(p)}> Rimuovi dal Carrello</button>
-                </li>
-              ))}
-            </ul>
+          addedProducts.length > 0 && (
+            <>
+              <h3>Nuovo Carrello</h3>
+              <ul>
+                {addedProducts.map((p, i) => (
+                  <li key={i}>
+                    <p>
+                      {p.name} === Prezzo : {p.price} € === Quantità : {p.quantity}
+                    </p>
+                    <button onClick={() => removeFromCart(p)}> Rimuovi dal Carrello</button>
+                  </li>
+                ))}
+              </ul>
 
-          </>)
+            </>
+          )
         }
       </ul>
       <h3>Totale da Pagare : {total.toFixed(2)}€</h3>
